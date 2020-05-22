@@ -5,10 +5,15 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const textRoutes = require('./api/routes/texting');
 const postRoutes = require('./api/routes/post');
+const bodyParser = require('body-parser');
+//const cors = require('cors');
 
-mongoose.connect('mongodb+srv://hieunguyen:Hieu1234@hieubase-r9ivh.gcp.mongodb.net/Post?retryWrites=true&w=majority'
-,{useNewUrlParser: true, useUnifiedTopology: true});
+//Middleware
+app.use(bodyParser.json());
+//app.use(cors());
 
+//Database connection
+mongoose.connect('mongodb://localhost:27017/Post',{useNewUrlParser: true, useUnifiedTopology: true});
 const db = mongoose.connection;
 
 mongoose.connection.once('open', function(){
@@ -16,10 +21,13 @@ mongoose.connection.once('open', function(){
 }).on('error', function(error){
     console.log('Connection error:', error);
 });
+
+//Routing
 app.use(morgan('dev'));
 app.use('/texting', textRoutes);
 app.use('/post', postRoutes);
 
+//Throw errors
 app.use((res, req, next) => {
     const error = new Error('Not found');
     error.status = 404;
@@ -34,5 +42,7 @@ app.use((error, req, res, next) => {
         }
     });
 });
+
+
 console.log(mongoose.connection.readyState);
 module.exports = app;

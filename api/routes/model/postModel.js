@@ -1,6 +1,6 @@
 const mg = require('mongoose');
 
-const comment = mg.Schema({
+const commentSchema = mg.Schema({
     content: String,
     like:{
         type: Number,
@@ -11,10 +11,10 @@ const comment = mg.Schema({
     date: Date
 });
 
-const post = mg.Schema({
+const postSchema = mg.Schema({
     role: {
         type: String,
-        default: 'Random'
+        require: true
     },
     location:{
         type: String,
@@ -26,26 +26,23 @@ const post = mg.Schema({
         default: 0
     },
     date:{
-        type: Date,
-        required: true
+        type: Date
     },
     like:{
         type: Number,
         required: true,
         default: 0
     },
-    comments: [comment]
+    comments: {
+        type: [commentSchema],
+        default: []
+    }
 });
 
-const Post = module.exports = mg.model('Post', post);
-
-const Comment = module.exports = mg.model('Comment', comment);
-
-module.exports.getComment = (callback, limit) => {
-    Comment.find(callback).limit(limit);
+module.exports = {
+    post: mg.model('post', postSchema),
+    comment: mg.model('comment', commentSchema)
 }
 
-module.exports.getPost = (callback, limit) => {
-    Post.find(callback).limit(limit);
-}
+
 
