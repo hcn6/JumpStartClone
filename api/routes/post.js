@@ -5,23 +5,9 @@ const router = express.Router();
 const postSchema = require('./model/postModel');
 
 router.post('/', async(req, res) => {
-    const role = req.body.role;
-    const location = req.body.location;
-    const viewNumber = req.body.viewNumber;
-    const date = req.body.date;
-    const like = req.body.like;
-    const comments = req.body.comments;
-    const post = new postSchema({
-        role: role,
-        location: location,
-        viewNumber: viewNumber,
-        date: date,
-        like: like,
-        comments: comments
-    });
-    console.log("Hello guys");
+    let post = new postSchema.post(req.body);
     try{
-        const savedPost = await post.save();
+        let savedPost = await post.save();
         res.json(savedPost);
     }
     catch(error){
@@ -31,14 +17,30 @@ router.post('/', async(req, res) => {
     }
 });
 
-router.get('/', function(req, res){
-    Post.getPost(function(err, post){
-        if(err){
-            res.send("Can't get post");
-        }
-        //res.send("Hello");
-        res.json(post);
-    });
+router.get('/:postID', async(req, res) => {
+    try{
+    let query = await postSchema.post.findById(req.params.postID);
+    res.json(query);
+    }
+    catch(error){
+        res.json({
+            message: error
+        });
+    }
+});
+
+router.post('/:postID/comment', async(req, res) => {
+    let comment = new postSchema.comment(req.body);
+    let id = req.params.postID;
+    try{
+        let newComment = await postSchema.post.findByIdAndUpdate(id, {$push:{comments: comment}}, {new:true});
+        res.json(newComment);
+    }
+    catch(error){
+        res.json({
+            message:error
+        });
+    }
 });
 
 const mongoose = require('mongoose');

@@ -1,17 +1,24 @@
 const mg = require('mongoose');
 
 const commentSchema = mg.Schema({
+    postedBy: {
+        type: mg.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     content: String,
     like:{
         type: Number,
         default: 0
     },
-    reply: [String],
     location: String,
     date: Date
 });
 
 const postSchema = mg.Schema({
+    postedBy: {
+        type: mg.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     role: {
         type: String,
         require: true
@@ -19,11 +26,6 @@ const postSchema = mg.Schema({
     location:{
         type: String,
         default: 'Anonymous @ Other'
-    },
-    viewNumber:{
-        type: Number,
-        require:true,
-        default: 0
     },
     date:{
         type: Date
@@ -40,8 +42,8 @@ const postSchema = mg.Schema({
 });
 
 module.exports = {
-    post: mg.model('post', postSchema),
-    comment: mg.model('comment', commentSchema)
+    post: mg.model('post', postSchema, 'post'),
+    comment: mg.model('comment', commentSchema, 'comments')
 }
 
 
