@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const postSchema = require('./model/postModel');
+const postSchema = require('../../model/postModel');
 
 router.post('/', async(req, res) => {
     let post = new postSchema.post(req.body);

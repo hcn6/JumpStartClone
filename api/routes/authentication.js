@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('./model/userModel');
+const User = require('../../model/userModel');
 
 router.post('/', (req, res, next) =>{
     if(req.body.passwordConf !== req.body.password){

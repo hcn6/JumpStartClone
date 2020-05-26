@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const userSchema = require('./model/userModel');
+const userSchema = require('../../model/userModel');
 
 router.post('/', async(req, res) =>{
     let name = req.body.username;
