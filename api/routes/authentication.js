@@ -1,35 +1,59 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../model/userModel');
-
-router.post('/', (req, res, next) =>{
+const mongoose = require('mongoose');
+const db = mongoose.connection;
+router.post('/', async(req, res, next) =>{
     if(req.body.passwordConf !== req.body.password){
         let error = new Error('Password do not match');
         error.status = 400;
-        res.send('Password do not match');
-        next(error);
+        return res.send('Password do not match');
     }
+
+    // await User.findOne({email: req.body.email}, (err, result) => {
+    //     if(err){
+    //         return next(err);
+    //     }
+    //     else if(result){
+    //         return res.json('Email is already registered');
+    //     }
+    //     else{
+    //         return next();
+    //     }
+    // });
+    
+    let result = await User.findOne({username: req.body.username});
+    if(result){
+        return res.send('Username is already registered');
+    }
+
+    result = await User.findOne({email: req.body.email});
+    if(result){
+        return res.send('Email is already registered');
+    }
+
     if(req.body.email
         && req.body.username
         && req.body.password
         && req.body.passwordConf){
+
         let userData = {
-            email:req.body.email,
-            username:req.body.username,
-            password:req.body.password,
-        };
-        User.create(userData, function(err, user){
+            email: req.body.email,
+            username: req.body.username,
+            password: req.body.password
+        }
+        await User.create(userData, function(err, user){
             if(err){
                 return next(err);
             }
             else{
                 req.session.id = user._id;
-                return res.json("Happy Registration");
+                return res.redirect('/post');
             }
         });
     }
     else if(req.body.logemail && req.body.logpassword){
-        User.authenticate(req.body.logemail, req.body.logpassword, (err, result) => {
+        await User.authenticate(req.body.logemail, req.body.logpassword, (err, result) => {
             if(err || !result){
                 err = new Error('Wrong email or password');
                 return next(err);
@@ -39,6 +63,11 @@ router.post('/', (req, res, next) =>{
                 return res.json(result);
             }
         })
+    }
+    else{
+        var err = new Error('All fields required.');
+        err.status = 400;
+        return next(err);
     }
 })
 
